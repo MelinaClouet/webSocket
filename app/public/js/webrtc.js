@@ -15,7 +15,7 @@ const config = {
 
 // Initialiser la connexion WebSocket pour la signalisation
 export function initSignaling() {
-    socket = initWebSocket("wss:///192.168.1.14:8080");
+    socket = initWebSocket("ws://localhost:3000");
 
     // Gérer les messages WebSocket
     socket.onmessage = async (message) => {
