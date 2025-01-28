@@ -66,59 +66,7 @@ wss.on('connection', (ws) => {
                 );
             }
 
-            if (data.type === "user") {
-                console.log(`Nouvel utilisateur : ${data.name}, Email: ${data.email}`);
-                console.log(`Position : Latitude = ${data.latitude}, Longitude = ${data.longitude}`);
 
-                User.getUserByEmail(data.email, async (result) => {
-                    if (result.length > 0) {
-                        console.log("Utilisateur existant trouvé dans la base de données");
-                        User.updateUserByEmail(
-                            data.email,
-                            {
-                                latitude: data.latitude,
-                                longitude: data.longitude,
-                                isConnected: true,
-                            },
-                            (updateResult) => {
-                                console.log("Position mise à jour :", updateResult);
-                            }
-                        );
-                    } else {
-                        console.log("Création d'un nouvel utilisateur");
-                        User.createUser(
-                            {
-                                email: data.email,
-                                name: data.name,
-                                latitude: data.latitude,
-                                longitude: data.longitude,
-                                isConnected: true,
-                            },
-                            (createResult) => {
-                                console.log("Nouvel utilisateur créé :", createResult);
-                            }
-                        );
-                    }
-
-                    console.log("get all users connected")
-                    // Récupérer tous les utilisateurs connectés
-                    User.getAllUsersConnected((results) => {
-                        const users = results.map((user) => ({
-                            email: user.email,
-                            name: user.name,
-                            latitude: user.latitude,
-                            longitude: user.longitude,
-                        }));
-
-
-                        // Envoyer les utilisateurs connectés à tous les clients WebSocket
-                        clients.forEach((client) => {
-                            client.send(JSON.stringify({ type: "users", users }));
-                        });
-                    });
-
-                });
-            }
         } catch (error) {
             console.error('Erreur lors du traitement du message:', error.message);
         }
