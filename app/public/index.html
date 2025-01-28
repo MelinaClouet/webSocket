@@ -6,16 +6,10 @@
     <title>Suivi GPS et Visioconférence</title>
     <script src="js/main.js" type="module"></script>
 
-    <script>
-        fetch('/api/google-maps-key')
-            .then((response) => response.json())
-            .then((data) => {
-                const script = document.createElement('script');
-                script.src = `https://maps.googleapis.com/maps/api/js?key=${data.key}&callback=initMap&v=weekly&libraries=marker`;
-                script.defer = true;
-                document.head.appendChild(script);
-            });
-    </script>
+    <script
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6fqGRUUEOLKVvbkUqDjDyJVU3BliGOW4&callback=initMap&v=weekly&libraries=marker"
+            defer
+    ></script>
 
     <style>
         body {
