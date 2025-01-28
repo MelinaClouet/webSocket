@@ -1,5 +1,6 @@
 import { initWebSocket, sendWebSocketData, closeWebSocketConnection } from '/js/websocket.js';
-import { addMarker, getGeolocation , updateMarker} from '/js/position.js';
+import { addMarker, getGeolocation , updateMarker } from '/js/position.js';
+import { initLocalStream, initSignaling } from '/js/webrtc.js';
 
 
 let map;
@@ -48,6 +49,7 @@ document.getElementById("loginForm").addEventListener("submit", (e) => {
     // Afficher le chargement
     loadingOverlay.style.display = "flex";
 
+
     getGeolocation()
         .then((coords) => {
             const latitude = coords.lat;
@@ -59,6 +61,12 @@ document.getElementById("loginForm").addEventListener("submit", (e) => {
             sendUserData(email, name, latitude, longitude); // Envoyer les données au serveur
             //updateUserInterface(userInfo, currentUser, name, email); // Mettre à jour l'interface
             addUserMarker(latitude, longitude, name, email); // Ajouter un marqueur sur la carte
+
+            // Initialiser le flux local
+            initLocalStream();
+
+            // Initialiser la signalisation WebSocket
+            initSignaling();
 
            if (!isTheFirst) {
                 startGeolocationUpdates();

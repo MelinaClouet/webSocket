@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suivi GPS en temps réel</title>
+    <title>Suivi GPS et Visioconférence</title>
     <script src="js/main.js" type="module"></script>
 
     <script>
@@ -18,28 +18,66 @@
     </script>
 
     <style>
-
-        .notification {
-            background-color: #e0f7fa; /* Couleur de fond */
-            color: #006064; /* Couleur du texte */
-            padding: 10px; /* Espacement interne */
-            border-radius: 5px; /* Coins arrondis */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Ombre */
-            margin-bottom: 10px; /* Espacement entre les notifications */
-            font-family: Arial, sans-serif; /* Police */
-            font-size: 14px; /* Taille du texte */
-            opacity: 1; /* Transition initiale */
-            transition: opacity 0.5s ease-in-out; /* Transition pour la disparition */
-        }
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #app {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
 
         #map {
-            height: 100vh;
+            flex: 2;
+            height: 100%;
+        }
+
+        #videoContainer {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            overflow-y: auto;
+        }
+
+        video {
+            border: 2px solid #ccc;
+            border-radius: 10px;
             width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        #localVideo {
+            border-color: #4caf50;
+        }
+
+        #notifications {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 10000;
+        }
+
+        .notification {
+            background-color: #e0f7fa; /* Couleur de fond */
+            color: #006064; /* Couleur du texte */
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
         }
 
         .modal-overlay {
@@ -102,18 +140,6 @@
             background-color: #45a049;
         }
 
-        .user-info {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            background-color: white;
-            padding: 1rem;
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 500;
-        }
-
-        /* Modale de chargement dynamique */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -127,7 +153,6 @@
             z-index: 2000;
         }
 
-        /* Spinner circulaire */
         .spinner {
             width: 50px;
             height: 50px;
@@ -137,7 +162,6 @@
             animation: spin 1s linear infinite;
         }
 
-        /* Animation du spinner */
         @keyframes spin {
             from {
                 transform: rotate(0deg);
@@ -149,8 +173,10 @@
     </style>
 </head>
 <body>
-<div id="locationStatus"></div>
-<div id="map"></div>
+<!-- Conteneur de notifications -->
+<div id="userInfo" class="user-info" style="display:none;">
+</div>
+<!-- Modale de connexion -->
 <div id="loginModal" class="modal-overlay">
     <div class="modal">
         <h2>Connexion</h2>
@@ -163,22 +189,27 @@
                 <label for="name">Nom</label>
                 <input type="text" id="name" required>
             </div>
-
             <button type="submit" class="submit-btn">Se connecter</button>
         </form>
     </div>
 </div>
+
+<!-- Modale de chargement -->
 <div id="loadingOverlay" class="loading-overlay" style="display: none;">
     <div class="spinner"></div>
 </div>
-<div id="userInfo" class="user-info" style="display:none;">
 
+<!-- Conteneur principal -->
+<div id="app">
+    <!-- Carte interactive -->
+    <div id="map"></div>
+
+    <!-- Conteneur des vidéos -->
+    <div id="videoContainer">
+        <!-- Flux vidéo local -->
+        <video id="localVideo" autoplay muted></video>
+        <!-- Les vidéos distantes seront ajoutées ici dynamiquement -->
+    </div>
 </div>
-
-<script>
-
-
-</script>
-
 </body>
 </html>

@@ -1,7 +1,9 @@
+const https = require('https');
+const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const WebSocket = require('ws');
-const userRoutes = require('./routes/userRoutes'); // Importer les routes de ton API
+const userRoutes = require('./routes/userRoutes'); // Routes API
 const path = require('path');
 const app = express();
 const http = require('http');
@@ -22,15 +24,11 @@ wss.on('connection', (ws) => {
 
     ws.on('message', async (message) => {
         try {
-            // Parse le message reçu
             const data = JSON.parse(message.toString());
             console.log('Message reçu:', data);
 
-            // Vérifie si le type est 'user' (pour enregistrer l'utilisateur)
-
             if (data.type === 'close') {
                 console.log(`Fermeture de la connexion pour : ${data.email}`);
-                // Mettre à jour l'utilisateur comme déconnecté
                 User.updateUserByEmail(
                     data.email,
                     {
@@ -78,8 +76,6 @@ wss.on('connection', (ws) => {
                         );
                     }
 
-                    console.log("get all users connected")
-                    // Récupérer tous les utilisateurs connectés
                     User.getAllUsersConnected((results) => {
                         const users = results.map((user) => ({
                             email: user.email,
@@ -88,13 +84,13 @@ wss.on('connection', (ws) => {
                             longitude: user.longitude,
                         }));
 
-
-                        // Envoyer les utilisateurs connectés à tous les clients WebSocket
+                        // Diffuser les utilisateurs connectés à tous les clients WebSocket
                         clients.forEach((client) => {
-                            client.send(JSON.stringify({ type: "users", users }));
+                            if (client.readyState === WebSocket.OPEN) {
+                                client.send(JSON.stringify({ type: "users", users }));
+                            }
                         });
                     });
-
                 });
             }
         } catch (error) {
@@ -111,13 +107,13 @@ wss.on('connection', (ws) => {
 // Middleware pour parser les requêtes JSON
 app.use(bodyParser.json());
 
-// Routes de l'API REST (par exemple, gestion des utilisateurs)
+// Routes de l'API REST
 app.use('/api', userRoutes);
 
 // Servir les fichiers statiques du dossier 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Route pour afficher le fichier HTML
+// Route principale pour afficher index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
