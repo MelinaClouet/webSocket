@@ -34,7 +34,7 @@ window.initMap = function () {
 document.getElementById("loginForm").addEventListener("submit", (e) => {
     e.preventDefault();
 
-    initWebSocket("ws://localhost:3000", map, markers);
+    initWebSocket("wss://melina.clouet.caen.mds-project.fr:3000", map, markers);
 
     const email = document.getElementById("email").value;
     const name = document.getElementById("name").value;
