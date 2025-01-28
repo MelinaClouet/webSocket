@@ -1,4 +1,19 @@
 
+
+export function updateMarker(markers, email, lat, lng) {
+    // Vérifier si le tableau des marqueurs contient un marqueur avec cet e-mail
+    const marker = markers.find((m) => m.getTitle() === email);
+
+    if (marker) {
+        // Mettre à jour la position du marqueur
+        marker.setPosition({ lat, lng });
+        console.log(`Marqueur mis à jour pour l'utilisateur ${email} :`, { lat, lng });
+    } else {
+        console.warn(`Aucun marqueur trouvé pour l'utilisateur avec l'e-mail : ${email}`);
+    }
+}
+
+
 // Fonction pour ajouter un marqueur sur la carte
 export function addMarker(map, markers, lat, lng, title) {
     console.log(map);

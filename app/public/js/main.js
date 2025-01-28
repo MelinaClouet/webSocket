@@ -1,10 +1,11 @@
 import { initWebSocket, sendWebSocketData, closeWebSocketConnection } from '/js/websocket.js';
-import { addMarker, getGeolocation } from '/js/position.js';
+import { addMarker, getGeolocation , updateMarker} from '/js/position.js';
 
 
 let map;
 let markers = []; // Tableau global pour stocker les marqueurs
-
+let isTheFirst = true;
+let geolocationInterval;
 
 window.initMap = function () {
     getGeolocation()
@@ -41,6 +42,7 @@ document.getElementById("loginForm").addEventListener("submit", (e) => {
     const userInfo = document.getElementById("userInfo");
     const currentUser = document.getElementById("currentUser");
 
+
     console.log("Données utilisateur saisies :", { email, name });
 
     // Afficher le chargement
@@ -57,6 +59,10 @@ document.getElementById("loginForm").addEventListener("submit", (e) => {
             sendUserData(email, name, latitude, longitude); // Envoyer les données au serveur
             //updateUserInterface(userInfo, currentUser, name, email); // Mettre à jour l'interface
             addUserMarker(latitude, longitude, name, email); // Ajouter un marqueur sur la carte
+
+           if (!isTheFirst) {
+                startGeolocationUpdates();
+            }
         })
         .catch((err) => {
             console.error(err.message);
@@ -86,6 +92,8 @@ window.onbeforeunload = function () {
 function closeModalAndLoader(modalElement, loaderElement) {
     modalElement.style.display = "none";
     loaderElement.style.display = "none";
+    isTheFirst = false;
+
 }
 
 function sendUserData(email, name, latitude, longitude) {
@@ -115,4 +123,42 @@ function addUserMarker(latitude, longitude, name, email) {
     console.log("Map :", map);
     console.log("Markers :", markers);
     addMarker(map, markers, latitude, longitude, `${name} (${email})`);
+}
+
+function updateUserMarker(email, lat, lng) {
+    console.log("Markers :", markers);
+    updateMarker(markers, email, lat, lng);
+
+}
+
+function startGeolocationUpdates() {
+    console.log("Démarrage des mises à jour de la géolocalisation...");
+    // Si un intervalle existe déjà, on le nettoie pour éviter les doublons
+    if (geolocationInterval) {
+        clearInterval(geolocationInterval);
+    }
+
+    // Actualiser la géolocalisation toutes les 5 minutes
+    geolocationInterval = setInterval(() => {
+        console.log("Mise à jour de la géolocalisation...");
+
+        getGeolocation()
+            .then((coords) => {
+                const email = document.getElementById("email").value;
+                const name = document.getElementById("name").value;
+                const latitude = coords.lat;
+                const longitude = coords.lng;
+
+                console.log("Nouvelle géolocalisation récupérée :", { latitude, longitude });
+
+                // Envoyer les données mises à jour au serveur
+                sendUserData(email, name, latitude, longitude);
+
+                // Mettre à jour le marqueur de l'utilisateur sur la carte
+                updateUserMarker(email, latitude, longitude);
+            })
+            .catch((err) => {
+                console.error("Erreur lors de l'actualisation de la géolocalisation :", err.message);
+            });
+    }, 5 * 60 * 1000); // 5 minutes en millisecondes
 }
