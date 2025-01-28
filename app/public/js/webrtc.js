@@ -15,7 +15,7 @@ const config = {
 
 // Initialiser la connexion WebSocket pour la signalisation
 export function initSignaling() {
-    socket = initWebSocket("wss://melina.clouet.caen.mds-project.fr:3000", map, markers);
+    socket = initWebSocket("ws://localhost:3000");
 
     // Gérer les messages WebSocket
     socket.onmessage = async (message) => {
